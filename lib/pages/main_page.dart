@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:superheroes/blocs/main_bloc.dart';
 import 'package:superheroes/resources/superheroes_colors.dart';
+import 'package:superheroes/resources/superheroes_images.dart';
 import 'package:superheroes/widgets/action_button.dart';
-import 'package:superheroes/widgets/favorites.dart';
-import 'package:superheroes/widgets/no_favorites.dart';
+import 'package:superheroes/widgets/info_with_button.dart';
+import 'package:superheroes/widgets/superhero_card.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -85,6 +86,69 @@ class MainPageStateWidget extends StatelessWidget {
         });
   }
 }
+
+
+
+
+
+
+
+
+class FavoritesWidget extends StatelessWidget {
+  const FavoritesWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        SizedBox(height: 90),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "Your favorites",
+              style: TextStyle(
+                  fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: SuperheroCard(name: "Batman", realName: "Bruce Wayne", imageUrl: "https://www.superherodb.com/pictures2/portraits/10/100/639.jpg"),
+        ),
+        SizedBox(height: 8),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: SuperheroCard(name: "Ironman", realName: "Tony Stark", imageUrl: "https://www.superherodb.com/pictures2/portraits/10/100/85.jpg"),
+        ),
+      ],
+    );
+  }
+}
+
+
+
+class NoFavoritesWidget extends StatelessWidget {
+  const NoFavoritesWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+        child: InfoWithButton(
+          assetImage: SuperheroesImages.ironMan,
+          imageHeight: 119,
+          imageWidth: 108,
+          imageTopPadding: 9,
+          title: "No favorites yet",
+          subtitle: "search and add",
+          buttonText: "search",)
+    );
+  }
+}
+
+
 
 class MinSymbolsWidget extends StatelessWidget {
   const MinSymbolsWidget({Key? key}) : super(key: key);
