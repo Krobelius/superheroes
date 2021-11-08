@@ -13,13 +13,12 @@ class ActionButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20,vertical:8),
         decoration: BoxDecoration(
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(8),
           color: SuperheroesColors.blue
         ),
-        alignment: Alignment.bottomCenter,
         child: Text(
           text.toUpperCase(),
           style: const TextStyle(fontSize: 14, color: Colors.white,fontWeight: FontWeight.w700),

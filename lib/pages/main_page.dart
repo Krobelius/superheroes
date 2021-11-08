@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:superheroes/blocs/main_bloc.dart';
 import 'package:superheroes/resources/superheroes_colors.dart';
 import 'package:superheroes/widgets/action_button.dart';
+import 'package:superheroes/widgets/favorites.dart';
+import 'package:superheroes/widgets/no_favorites.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -41,7 +43,9 @@ class MainPageContent extends StatelessWidget {
     final MainBloc bloc = Provider.of<MainBloc>(context);
     return Stack(children: [
       const MainPageStateWidget(),
-      ActionButton(text: "Next state", onTap: bloc.nextState),
+      Align(
+          alignment: const Alignment(0,0.9),
+          child: ActionButton(text: "Next state", onTap: bloc.nextState)),
     ]);
   }
 }
@@ -63,12 +67,14 @@ class MainPageStateWidget extends StatelessWidget {
             case MainPageState.loading:
               return const LoadingIndicator();
             case MainPageState.noFavorites:
+              return const NoFavoritesWidget();
             case MainPageState.minSymbols:
               return const MinSymbolsWidget();
             case MainPageState.nothingFound:
             case MainPageState.loadingError:
             case MainPageState.searchResults:
             case MainPageState.favorites:
+              return const FavoritesWidget();
             default:
               return Center(
                   child: Text(
