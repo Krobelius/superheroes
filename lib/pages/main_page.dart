@@ -240,7 +240,7 @@ class LoadingErrorWidget extends StatelessWidget {
           imageTopPadding: 22,
           title: "Error happened",
           subtitle: "Please, try again",
-          buttonText: "retry",
+          buttonText: "Retry",
         ));
   }
 }
