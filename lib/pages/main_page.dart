@@ -203,8 +203,8 @@ class NoFavoritesWidget extends StatelessWidget {
       imageWidth: 108,
       imageTopPadding: 9,
       title: "No favorites yet",
-      subtitle: "search and add",
-      buttonText: "search",
+      subtitle: "Search and add",
+      buttonText: "Search",
     ));
   }
 }
@@ -222,7 +222,7 @@ class NothingFoundWidget extends StatelessWidget {
           imageTopPadding: 9,
           title: "Nothing found",
           subtitle: "Search for something else",
-          buttonText: "search",
+          buttonText: "Search",
         ));
   }
 }
