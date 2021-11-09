@@ -235,8 +235,8 @@ class LoadingErrorWidget extends StatelessWidget {
     return const Center(
         child: InfoWithButton(
           assetImage: SuperheroesImages.superman,
-          imageHeight: 126,
-          imageWidth: 106,
+          imageHeight: 106,
+          imageWidth: 126,
           imageTopPadding: 22,
           title: "Error happened",
           subtitle: "Please, try again",
