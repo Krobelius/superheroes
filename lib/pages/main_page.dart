@@ -70,7 +70,9 @@ class _SearchWidgetState extends State<SearchWidget> {
     super.initState();
     fNode.addListener(() {
       setState(() {
-        side = (!fNode.hasFocus && controller.text.isNotEmpty) ? const BorderSide(color: Colors.white, width: 2) : const BorderSide(color: Colors.white24);
+        side = (!fNode.hasFocus && controller.text.isNotEmpty)
+            ? const BorderSide(color: Colors.white, width: 2)
+            : const BorderSide(color: Colors.white24);
       });
     });
     SchedulerBinding.instance?.addPostFrameCallback((timeStamp) {
@@ -95,11 +97,9 @@ class _SearchWidgetState extends State<SearchWidget> {
             borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(color: Colors.white, width: 2)),
         enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: side),
+            borderRadius: BorderRadius.circular(8), borderSide: side),
         border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: side),
+            borderRadius: BorderRadius.circular(8), borderSide: side),
         isDense: true,
         suffix: GestureDetector(
           onTap: () {
@@ -168,6 +168,7 @@ class SuperheroesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
     return StreamBuilder<List<SuperheroInfo>>(
         stream: stream,
         builder: (context, snapshot) {
@@ -175,42 +176,51 @@ class SuperheroesList extends StatelessWidget {
             return const SizedBox.shrink();
           }
           final List<SuperheroInfo> superheroes = snapshot.data!;
-          return ListView.separated(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            itemCount: superheroes.length + 1,
-            itemBuilder: (BuildContext context, int index) {
-              if (index == 0) {
+          return Stack(children: [
+            ListView.separated(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              itemCount: superheroes.length + 1,
+              itemBuilder: (BuildContext context, int index) {
+                if (index == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                        left: 16, right: 16, top: 90, bottom: 20),
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white),
+                    ),
+                  );
+                }
+                final SuperheroInfo item = superheroes[index - 1];
                 return Padding(
-                  padding: const EdgeInsets.only(
-                      left: 16, right: 16, top: 90, bottom: 20),
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SuperheroCard(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              SuperheroPage(heroName: item.name)));
+                    },
+                    superheroInfo: item,
                   ),
                 );
-              }
-              final SuperheroInfo item = superheroes[index - 1];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SuperheroCard(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            SuperheroPage(heroName: item.name)));
-                  },
-                  superheroInfo: item,
-                ),
-              );
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return const SizedBox(
-                height: 8,
-              );
-            },
-          );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(
+                  height: 8,
+                );
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                  child: ActionButton(
+                      text: "Remove", onTap: () => bloc.removeFavorites())),
+            )
+          ]);
         });
   }
 }
@@ -220,16 +230,27 @@ class NoFavoritesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-        child: InfoWithButton(
-      assetImage: SuperheroesImages.ironMan,
-      imageHeight: 119,
-      imageWidth: 108,
-      imageTopPadding: 9,
-      title: "No favorites yet",
-      subtitle: "Search and add",
-      buttonText: "Search",
-    ));
+    final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
+    return Stack(
+      children: [
+        const Center(
+            child: InfoWithButton(
+          assetImage: SuperheroesImages.ironMan,
+          imageHeight: 119,
+          imageWidth: 108,
+          imageTopPadding: 9,
+          title: "No favorites yet",
+          subtitle: "Search and add",
+          buttonText: "Search",
+        )),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ActionButton(
+                  text: "Remove", onTap: () => bloc.removeFavorites())),
+        )      ],
+    );
   }
 }
 
