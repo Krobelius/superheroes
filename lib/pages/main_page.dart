@@ -70,7 +70,7 @@ class _SearchWidgetState extends State<SearchWidget> {
     super.initState();
     fNode.addListener(() {
       setState(() {
-        side = (fNode.hasFocus && controller.text.isNotEmpty) ? const BorderSide(color: Colors.white, width: 2) : const BorderSide(color: Colors.white24);
+        side = (!fNode.hasFocus && controller.text.isNotEmpty) ? const BorderSide(color: Colors.white, width: 2) : const BorderSide(color: Colors.white24);
       });
     });
     SchedulerBinding.instance?.addPostFrameCallback((timeStamp) {
@@ -102,7 +102,9 @@ class _SearchWidgetState extends State<SearchWidget> {
         borderSide: side),
         isDense: true,
         suffix: GestureDetector(
-          onTap: () => controller.clear(),
+          onTap: () {
+            controller.clear();
+          },
           child: const Icon(Icons.clear, color: Colors.white),
         ),
       ),
