@@ -131,7 +131,18 @@ class MainPageStateWidget extends StatelessWidget {
             case MainPageState.loading:
               return const LoadingIndicator();
             case MainPageState.noFavorites:
-              return const NoFavoritesWidget();
+              return Stack(
+                children: [
+                  const NoFavoritesWidget(),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: ActionButton(
+                            text: "Remove", onTap: () => bloc.removeFavorites())),
+                  )
+                ],
+              );
             case MainPageState.minSymbols:
               return const MinSymbolsWidget();
             case MainPageState.nothingFound:
@@ -144,9 +155,20 @@ class MainPageStateWidget extends StatelessWidget {
                 stream: bloc.observeSearchedSuperheroes(),
               );
             case MainPageState.favorites:
-              return SuperheroesList(
-                title: "Your favorites",
-                stream: bloc.observeFavoriteSuperheroes(),
+              return Stack(
+                children: [
+                  SuperheroesList(
+                    title: "Your favorites",
+                    stream: bloc.observeFavoriteSuperheroes(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                        child: ActionButton(
+                            text: "Remove", onTap: () => bloc.removeFavorites())),
+                  )
+                ],
               );
             default:
               return Center(
@@ -168,7 +190,6 @@ class SuperheroesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
     return StreamBuilder<List<SuperheroInfo>>(
         stream: stream,
         builder: (context, snapshot) {
@@ -213,13 +234,6 @@ class SuperheroesList extends StatelessWidget {
                 );
               },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                  child: ActionButton(
-                      text: "Remove", onTap: () => bloc.removeFavorites())),
-            )
           ]);
         });
   }
@@ -230,27 +244,16 @@ class NoFavoritesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
-    return Stack(
-      children: [
-        const Center(
-            child: InfoWithButton(
-          assetImage: SuperheroesImages.ironMan,
-          imageHeight: 119,
-          imageWidth: 108,
-          imageTopPadding: 9,
-          title: "No favorites yet",
-          subtitle: "Search and add",
-          buttonText: "Search",
-        )),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ActionButton(
-                  text: "Remove", onTap: () => bloc.removeFavorites())),
-        )      ],
-    );
+    return const Center(
+        child: InfoWithButton(
+      assetImage: SuperheroesImages.ironMan,
+      imageHeight: 119,
+      imageWidth: 108,
+      imageTopPadding: 9,
+      title: "No favorites yet",
+      subtitle: "Search and add",
+      buttonText: "Search",
+    ));
   }
 }
 
