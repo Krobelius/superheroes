@@ -57,8 +57,7 @@ class MainBloc {
 
   void removeFavorites() {
     if(favoriteSuperheroesSubject.value.isNotEmpty){
-      final newHeroList = favoriteSuperheroesSubject.value.sublist(0,favoriteSuperheroesSubject.value.length -1);
-      favoriteSuperheroesSubject.add(newHeroList);
+      favoriteSuperheroesSubject.add(favoriteSuperheroesSubject.value.sublist(0,favoriteSuperheroesSubject.value.length -1));
     } else {
       favoriteSuperheroesSubject.add(SuperheroInfo.mocked);
     }

@@ -62,29 +62,28 @@ class SearchWidget extends StatefulWidget {
 
 class _SearchWidgetState extends State<SearchWidget> {
   final TextEditingController controller = TextEditingController();
-  final FocusNode fNode = FocusNode();
-  BorderSide side = const BorderSide(color: Colors.white24);
+  bool haveSearchedText = false;
 
   @override
   void initState() {
     super.initState();
-    fNode.addListener(() {
-      setState(() {
-        side = (!fNode.hasFocus && controller.text.isNotEmpty)
-            ? const BorderSide(color: Colors.white, width: 2)
-            : const BorderSide(color: Colors.white24);
-      });
-    });
     SchedulerBinding.instance?.addPostFrameCallback((timeStamp) {
       final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
-      controller.addListener(() => bloc.updateText(controller.text));
+      controller.addListener(() {
+        bloc.updateText(controller.text);
+        final haveText = controller.text.isNotEmpty;
+        if (haveSearchedText != haveText) {
+          setState(() {
+            haveSearchedText = haveText;
+          });
+        }
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      focusNode: fNode,
       cursorColor: Colors.white,
       textInputAction: TextInputAction.search,
       textCapitalization: TextCapitalization.words,
@@ -97,9 +96,11 @@ class _SearchWidgetState extends State<SearchWidget> {
             borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(color: Colors.white, width: 2)),
         enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8), borderSide: side),
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8), borderSide: side),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: haveSearchedText
+                ? const BorderSide(color: Colors.white, width: 2)
+                : const BorderSide(color: Colors.white24)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         isDense: true,
         suffix: GestureDetector(
           onTap: () {
@@ -139,7 +140,8 @@ class MainPageStateWidget extends StatelessWidget {
                     child: Align(
                         alignment: Alignment.bottomCenter,
                         child: ActionButton(
-                            text: "Remove", onTap: () => bloc.removeFavorites())),
+                            text: "Remove",
+                            onTap: () => bloc.removeFavorites())),
                   )
                 ],
               );
@@ -164,9 +166,10 @@ class MainPageStateWidget extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
                     child: Align(
-                      alignment: Alignment.bottomCenter,
+                        alignment: Alignment.bottomCenter,
                         child: ActionButton(
-                            text: "Remove", onTap: () => bloc.removeFavorites())),
+                            text: "Remove",
+                            onTap: () => bloc.removeFavorites())),
                   )
                 ],
               );
