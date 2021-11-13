@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/retry.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:http/http.dart' as http;
+import 'package:superheroes/exception/api_exception.dart';
 import 'package:superheroes/model/superhero.dart';
 
 class MainBloc {
@@ -77,22 +79,36 @@ class MainBloc {
 
   Future<List<SuperheroInfo>> search(final String text) async {
     final token = dotenv.env['SUPERHERO_TOKEN'];
-    final response = await (client ??= http.Client()).get(Uri.parse("https://superheroapi.com/api/$token/search/$text"));
+    final response = await (client ??= http.Client())
+        .get(Uri.parse("https://superheroapi.com/api/$token/search/$text"));
     final decoded = json.decode(response.body);
-    if (decoded['response'] == 'success') {
-      final List<dynamic> results = decoded['results'];
-      final List<Superhero> superheroes = results.map((rawSuperhero) => Superhero.fromJson(rawSuperhero)).toList();
-      final List<SuperheroInfo> found = superheroes.map((superhero) {
-        return SuperheroInfo(
-            name: superhero.name,
-            realName: superhero.biography.fullName,
-            imageUrl: superhero.image.url);
-      }).toList();
-      return found;
-    } else if (decoded['response'] == 'error') {
-      if(decoded['error'] == "character with given name not found"){
-        return [];
+    if (response.statusCode != 200) {
+      if (response.statusCode >= 500 && response.statusCode <= 599) {
+        throw ApiException("Server error happened");
+      } else if (response.statusCode >= 400 && response.statusCode <= 499) {
+        throw ApiException("Client error happened");
       }
+    } else {
+      if (decoded['response'] == 'success') {
+        final List<dynamic> results = decoded['results'];
+        final List<Superhero> superheroes = results
+            .map((rawSuperhero) => Superhero.fromJson(rawSuperhero))
+            .toList();
+        final List<SuperheroInfo> found = superheroes.map((superhero) {
+          return SuperheroInfo(
+              name: superhero.name,
+              realName: superhero.biography.fullName,
+              imageUrl: superhero.image.url);
+        }).toList();
+        return found;
+      } else if (decoded['response'] == 'error') {
+        if (decoded['error'] == "character with given name not found") {
+          return [];
+        } else {
+          throw ApiException("Client error happened");
+        }
+      }
+      throw Exception("Unknown error happened");
     }
     throw Exception("Unknown error happened");
   }

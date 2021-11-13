@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 
 class MainPage extends StatefulWidget {
   final http.Client? client;
+
   const MainPage({Key? key, this.client}) : super(key: key);
 
   @override
@@ -24,7 +25,7 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    bloc =  MainBloc(client: widget.client);
+    bloc = MainBloc(client: widget.client);
   }
 
   @override
@@ -255,7 +256,7 @@ class NoFavoritesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
         child: InfoWithButton(
       assetImage: SuperheroesImages.ironMan,
       imageHeight: 119,
@@ -264,6 +265,9 @@ class NoFavoritesWidget extends StatelessWidget {
       title: "No favorites yet",
       subtitle: "Search and add",
       buttonText: "Search",
+      onTap: () {
+        FocusScope.of(context).nextFocus();
+      },
     ));
   }
 }
@@ -273,7 +277,7 @@ class NothingFoundWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
         child: InfoWithButton(
       assetImage: SuperheroesImages.hulk,
       imageHeight: 112,
@@ -282,6 +286,9 @@ class NothingFoundWidget extends StatelessWidget {
       title: "Nothing found",
       subtitle: "Search for something else",
       buttonText: "Search",
+      onTap: () {
+        FocusScope.of(context).nextFocus();
+      },
     ));
   }
 }
@@ -291,7 +298,7 @@ class LoadingErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
         child: InfoWithButton(
       assetImage: SuperheroesImages.superman,
       imageHeight: 106,
@@ -300,6 +307,7 @@ class LoadingErrorWidget extends StatelessWidget {
       title: "Error happened",
       subtitle: "Please, try again",
       buttonText: "Retry",
+      onTap: () {},
     ));
   }
 }

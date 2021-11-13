@@ -11,6 +11,7 @@ class InfoWithButton extends StatelessWidget {
   final double imageHeight;
   final double imageWidth;
   final double imageTopPadding;
+  final VoidCallback onTap;
 
   const InfoWithButton(
       {Key? key,
@@ -18,6 +19,7 @@ class InfoWithButton extends StatelessWidget {
       required this.subtitle,
       required this.buttonText,
       required this.assetImage,
+      required this.onTap,
       required this.imageHeight,
       required this.imageWidth,
       required this.imageTopPadding})
@@ -37,23 +39,29 @@ class InfoWithButton extends StatelessWidget {
           ),
           Padding(
             padding: EdgeInsets.only(top: imageTopPadding),
-            child: Image.asset(assetImage,height: imageHeight,width: imageWidth,),
+            child: Image.asset(
+              assetImage,
+              height: imageHeight,
+              width: imageWidth,
+            ),
           )
         ]),
         const SizedBox(height: 20),
         Center(
             child: Text(
           title,
-          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w800,color: Colors.white),
+          style: const TextStyle(
+              fontSize: 32, fontWeight: FontWeight.w800, color: Colors.white),
         )),
         const SizedBox(height: 20),
         Center(
             child: Text(
-              subtitle.toUpperCase(),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700,color: Colors.white),
-            )),
+          subtitle.toUpperCase(),
+          style: const TextStyle(
+              fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+        )),
         const SizedBox(height: 30),
-        ActionButton(text: buttonText, onTap: () {})
+        ActionButton(text: buttonText, onTap: onTap)
       ],
     );
   }
