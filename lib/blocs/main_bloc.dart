@@ -113,6 +113,11 @@ class MainBloc {
     throw Exception("Unknown error happened");
   }
 
+  void retry(){
+    final currentText = currentTextSubject.value;
+    searchForSuperheroes(currentText);
+  }
+
   Stream<MainPageState> observeMainPageState() => stateSubject;
 
   void updateText(final String? text) {
