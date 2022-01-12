@@ -10,6 +10,7 @@ import 'package:superheroes/model/server_image.dart';
 import 'package:superheroes/model/superhero.dart';
 import 'package:superheroes/resources/superheroes_colors.dart';
 import 'package:superheroes/resources/superheroes_icons.dart';
+import 'package:superheroes/resources/superheroes_images.dart';
 import 'package:superheroes/widgets/action_button.dart';
 import 'package:http/http.dart' as http;
 
@@ -119,6 +120,17 @@ class SuperheroAppBar extends StatelessWidget {
         background: CachedNetworkImage(
           imageUrl: superhero.image.url,
           fit: BoxFit.cover,
+          errorWidget: (context, url, error) {
+            return Center(
+                child: Image.asset(
+              SuperheroesImages.unknownBig
+            ));
+          },
+          placeholder: (context, url) {
+            return Container(
+              color: SuperheroesColors.indigo75,
+            );
+          },
         ),
       ),
     );
@@ -311,10 +323,46 @@ class BiographyWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+          color: SuperheroesColors.indigo75,
+          borderRadius: BorderRadius.circular(20)),
       alignment: Alignment.center,
-      child: Text(biography.toJson().toString(),
-          style: const TextStyle(color: Colors.white)),
+      child: Column(
+        children:  [
+          const SizedBox(height: 16),
+          const Text(
+            "BIO",
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+            child: Align(
+              alignment:Alignment.centerLeft,
+              child: Column(
+                children: [
+                  const Text(
+                    "FULL NAME",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                        color: SuperheroesColors.gray),
+                  ),
+                  Text(
+                    biography.fullName,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                        color: SuperheroesColors.gray),
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

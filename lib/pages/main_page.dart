@@ -231,7 +231,8 @@ class SuperheroesList extends StatelessWidget {
                   return ListTitleWidget(title: title);
                 }
                 final SuperheroInfo item = superheroes[index - 1];
-                return ListTile(superhero: item);
+                return ListTile(
+                    superhero: item, ableToSwipe: title == "Your favorites");
               },
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(
@@ -248,39 +249,67 @@ class ListTile extends StatelessWidget {
   const ListTile({
     Key? key,
     required this.superhero,
+    required this.ableToSwipe,
   }) : super(key: key);
 
   final SuperheroInfo superhero;
+  final bool ableToSwipe;
 
   @override
   Widget build(BuildContext context) {
     final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Dismissible(
-        key: ValueKey(superhero.id),
-        child: SuperheroCard(
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => SuperheroPage(id: superhero.id)));
-          },
-          superheroInfo: superhero,
-        ),
-        background: Container(
-          height: 70,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: SuperheroesColors.red
-          ),
-          child: const Text(
-            "Remove from favorites",
-            style: TextStyle(
-                fontSize: 12, color: Colors.white, fontWeight: FontWeight.w700),
-          ),
-        ),
-        onDismissed: (_) => bloc.removeFromFavorites(superhero.id),
-      ),
+      child: ableToSwipe
+          ? Dismissible(
+              key: ValueKey(superhero.id),
+              child: SuperheroCard(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => SuperheroPage(id: superhero.id)));
+                },
+                superheroInfo: superhero,
+              ),
+              background: Container(
+                height: 70,
+                padding: const EdgeInsets.symmetric(vertical: 11,horizontal: 16),
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: SuperheroesColors.red),
+                child: Text(
+                  "Remove\nfrom\nfavorites".toUpperCase(),
+                  style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700),
+                ),
+              ),
+              secondaryBackground: Container(
+                height: 70,
+                padding: const EdgeInsets.symmetric(vertical: 11,horizontal: 16),
+                alignment: Alignment.centerRight,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: SuperheroesColors.red),
+                child: Text(
+                  "Remove\nfrom\nfavorites".toUpperCase(),
+                  textDirection: TextDirection.rtl,
+                  style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700),
+                ),
+              ),
+              onDismissed: (_) => bloc.removeFromFavorites(superhero.id),
+            )
+          : SuperheroCard(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => SuperheroPage(id: superhero.id)));
+              },
+              superheroInfo: superhero,
+            ),
     );
   }
 }
