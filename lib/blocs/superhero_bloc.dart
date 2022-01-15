@@ -12,6 +12,7 @@ class SuperheroBloc {
   final String id;
   http.Client? client;
 
+  final superheroStateSubject = BehaviorSubject<SuperheroPageState>();
   final superheroSubject = BehaviorSubject<Superhero>();
 
   SuperheroBloc({required this.id, this.client}) {
@@ -23,11 +24,18 @@ class SuperheroBloc {
   StreamSubscription? addToFavoriteSubscription;
   StreamSubscription? removeFromFavoriteSubscription;
 
-  void requestSuperhero() {
+  void requestSuperhero(final bool isInFavorites) {
     requestSubscription?.cancel();
     requestSubscription = request().asStream().listen((superhero) {
-      superheroSubject.add(superhero);
+      final previousSuperhero = superheroSubject.valueOrNull;
+      if (previousSuperhero == null || !(superhero == previousSuperhero)) {
+        superheroStateSubject.add(SuperheroPageState.loaded);
+        superheroSubject.add(superhero);
+      }
     }, onError: (error, stackTrace) {
+      if(!isInFavorites) {
+        superheroStateSubject.add(SuperheroPageState.error);
+      }
       print("Error happened in requestSuperhero: $error, $stackTrace");
     });
   }
@@ -38,13 +46,16 @@ class SuperheroBloc {
         .getSuperhero(id)
         .asStream()
         .listen((superhero) {
-          if(superhero != null) {
-            superheroSubject.add(superhero);
-          }
-          requestSuperhero();
+      if (superhero != null) {
+        superheroStateSubject.add(SuperheroPageState.loaded);
+        superheroSubject.add(superhero);
+      } else {
+        superheroStateSubject.add(SuperheroPageState.loading);
+      }
+      requestSuperhero(superhero != null);
     },
         onError: (error, stackTrace) =>
-            print("ERROR HAPPENED IN getFromFavorites: $error $stackTrace"));
+           superheroStateSubject.add(SuperheroPageState.error));
   }
 
 
@@ -63,9 +74,11 @@ class SuperheroBloc {
         .listen((event) {
       print('Added to favorites: $event');
     },
-            onError: (error, stackTrace) =>
-                print("ERROR HAPPENED IN addToFavorite: $error $stackTrace"));
+        onError: (error, stackTrace) =>
+            print("ERROR HAPPENED IN addToFavorite: $error $stackTrace"));
   }
+
+
 
   void removeFromFavorites() {
     final superhero = superheroSubject.valueOrNull;
@@ -82,7 +95,8 @@ class SuperheroBloc {
         .listen((event) {
       print('Removed from favorites: $event');
     },
-            onError: (error, stackTrace) => print(
+        onError: (error, stackTrace) =>
+            print(
                 "ERROR HAPPENED IN removeFromFavorites: $error $stackTrace"));
   }
 
@@ -100,20 +114,36 @@ class SuperheroBloc {
       throw ApiException("Client error happened");
     }
     if (decoded['response'] == 'success') {
-      return Superhero.fromJson(decoded);
+      final actualSuperhero =  Superhero.fromJson(decoded);
+      FavoriteSuperheroesStorage.getInstance().updateSuperhero(actualSuperhero);
+      return actualSuperhero;
     } else if (decoded['response'] == 'error') {
       throw ApiException("Client error happened");
     }
     throw Exception("Unknown error happened");
   }
 
-  Stream<Superhero> observeSuperhero() => superheroSubject;
+  Stream<Superhero> observeSuperhero() {
+    return superheroSubject;
+  }
+  Stream<SuperheroPageState> observeSuperheroPageState() {
+    return superheroStateSubject.distinct();
+  }
 
   void dispose() {
     client?.close();
+    superheroStateSubject.close();
+    superheroSubject.close();
     getFromFavoritesSubscription?.cancel();
     requestSubscription?.cancel();
     addToFavoriteSubscription?.cancel();
     removeFromFavoriteSubscription?.cancel();
   }
+
+}
+
+enum SuperheroPageState{
+  loading,
+  loaded,
+  error
 }

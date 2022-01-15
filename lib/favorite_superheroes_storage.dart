@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:superheroes/model/superhero.dart';
+import 'package:collection/collection.dart';
 
 class FavoriteSuperheroesStorage {
   static const _key = "favorite_superheroes";
@@ -61,6 +62,17 @@ class FavoriteSuperheroesStorage {
       }
     }
     return null;
+  }
+
+  void updateSuperhero(final Superhero actualSuperhero) async {
+    final superheroes = await _getSuperheroes();
+    final findSuperhero = superheroes
+        .firstWhereOrNull((superhero) => superhero.id == actualSuperhero.id);
+    if (findSuperhero != null) {
+      final index = superheroes.indexOf(findSuperhero);
+      superheroes[index] = actualSuperhero;
+      _setSuperheroes(superheroes);
+    }
   }
 
   Stream<List<Superhero>> observeFavoriteSuperheroes() async* {

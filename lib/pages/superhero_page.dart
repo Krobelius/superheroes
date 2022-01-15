@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:superheroes/blocs/superhero_bloc.dart';
+import 'package:superheroes/model/alignment_info.dart';
 import 'package:superheroes/model/biography.dart';
 import 'package:superheroes/model/powerstats.dart';
 import 'package:superheroes/model/server_image.dart';
@@ -76,9 +77,9 @@ class SuperheroContentPage extends StatelessWidget {
                   const SizedBox(
                     height: 30,
                   ),
+                  BiographyWidget(biography: superhero.biography),
                   if (superhero.powerstats.isNotNull())
                     PowerstatsWidget(powerstats: superhero.powerstats),
-                  BiographyWidget(biography: superhero.biography)
                 ],
               ),
             ),
@@ -119,12 +120,13 @@ class SuperheroAppBar extends StatelessWidget {
         centerTitle: true,
         background: CachedNetworkImage(
           imageUrl: superhero.image.url,
-          fit: BoxFit.cover,
           errorWidget: (context, url, error) {
-            return Center(
-                child: Image.asset(
-              SuperheroesImages.unknownBig
-            ));
+            return Container(
+              color: SuperheroesColors.indigo75,
+              child: Image.asset(
+                SuperheroesImages.unknown,
+              ),
+            );
           },
           placeholder: (context, url) {
             return Container(
@@ -328,39 +330,97 @@ class BiographyWidget extends StatelessWidget {
           color: SuperheroesColors.indigo75,
           borderRadius: BorderRadius.circular(20)),
       alignment: Alignment.center,
-      child: Column(
-        children:  [
-          const SizedBox(height: 16),
-          const Text(
-            "BIO",
-            style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
-            child: Align(
-              alignment:Alignment.centerLeft,
-              child: Column(
-                children: [
-                  const Text(
-                    "FULL NAME",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                        color: SuperheroesColors.gray),
+      child: Stack(
+        children: [
+          Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: biography.alignmentInfo!.color,
+                  borderRadius: const BorderRadius.only(topRight: Radius.circular(20),bottomLeft: Radius.circular(20))
+                ),
+                width: 24,
+                height: 70,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6,vertical: 12),
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: Center(child: Text(biography.alignmentInfo!.name.toUpperCase(),style: TextStyle(color: Colors.white,fontSize: 10,fontWeight: FontWeight.w700),)),
                   ),
-                  Text(
-                    biography.fullName,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                        color: SuperheroesColors.gray),
-                  ),
-                ],
+                ),
+              )),
+          Column(
+            children: [
+              const SizedBox(height: 16),
+              const Text(
+                "BIO",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18),
               ),
-            ),
-          )
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "FULL NAME",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                            color: SuperheroesColors.gray),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        biography.fullName,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "ALIASES",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                            color: SuperheroesColors.gray),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        biography.aliases.join(", "),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        "Place of birth".toUpperCase(),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                            color: SuperheroesColors.gray),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        biography.placeOfBirth,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
         ],
       ),
     );
