@@ -123,6 +123,18 @@ class SuperheroBloc {
     throw Exception("Unknown error happened");
   }
 
+
+  void retry() async {
+    superheroStateSubject.add(SuperheroPageState.loading);
+    try{
+      final retriedSuperhero = await request();
+      superheroStateSubject.add(SuperheroPageState.loaded);
+      superheroSubject.add(retriedSuperhero);
+    } catch(ex) {
+      superheroStateSubject.add(SuperheroPageState.error);
+    }
+  }
+
   Stream<Superhero> observeSuperhero() {
     return superheroSubject;
   }

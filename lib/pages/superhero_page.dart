@@ -14,6 +14,7 @@ import 'package:superheroes/resources/superheroes_icons.dart';
 import 'package:superheroes/resources/superheroes_images.dart';
 import 'package:superheroes/widgets/action_button.dart';
 import 'package:http/http.dart' as http;
+import 'package:superheroes/widgets/info_with_button.dart';
 
 class SuperheroPage extends StatefulWidget {
   final http.Client? client;
@@ -59,34 +60,106 @@ class SuperheroContentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = Provider.of<SuperheroBloc>(context, listen: false);
-    return StreamBuilder<Superhero>(
-      stream: bloc.observeSuperhero(),
+    return StreamBuilder<SuperheroPageState>(
+      stream: bloc.observeSuperheroPageState(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data == null) {
           return const SizedBox();
         }
-        final superhero = snapshot.data!;
-        return CustomScrollView(
-          physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics()),
-          slivers: [
-            SuperheroAppBar(superhero: superhero),
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  BiographyWidget(biography: superhero.biography),
-                  if (superhero.powerstats.isNotNull())
-                    PowerstatsWidget(powerstats: superhero.powerstats),
-                ],
-              ),
-            ),
-          ],
-        );
+        final superheroState = snapshot.data!;
+        switch (superheroState) {
+          case SuperheroPageState.loaded:
+            return const SuperheroPageInfo();
+          case SuperheroPageState.loading:
+            return const CustomScrollView(
+              physics: BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              slivers: [
+                SliverAppBar(
+                  backgroundColor: SuperheroesColors.background,
+                ),
+                SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 60),
+                      child: Align(
+                          alignment: Alignment.center,
+                          child: CircularProgressIndicator(
+                              color: SuperheroesColors.blue)),
+                    )),
+              ],
+            );
+          case SuperheroPageState.error:
+            return const CustomScrollView(
+              physics: BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              slivers: [
+                SliverAppBar(
+                  backgroundColor: SuperheroesColors.background,
+                ),
+                SliverToBoxAdapter(child: LoadingSuperheroErrorWidget()),
+              ],
+            );
+        }
       },
     );
+  }
+}
+
+class LoadingSuperheroErrorWidget extends StatelessWidget {
+  const LoadingSuperheroErrorWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = Provider.of<SuperheroBloc>(context, listen: false);
+    return Center(
+        child: InfoWithButton(
+      assetImage: SuperheroesImages.superman,
+      imageHeight: 106,
+      imageWidth: 126,
+      imageTopPadding: 22,
+      title: "Error happened",
+      subtitle: "Please, try again",
+      buttonText: "Retry",
+      onTap: bloc.retry,
+    ));
+  }
+}
+
+class SuperheroPageInfo extends StatelessWidget {
+  const SuperheroPageInfo({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = Provider.of<SuperheroBloc>(context, listen: false);
+    return StreamBuilder<Superhero>(
+        stream: bloc.observeSuperhero(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const SizedBox();
+          }
+          final superhero = snapshot.data!;
+          return CustomScrollView(
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
+            slivers: [
+              SuperheroAppBar(superhero: superhero),
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    BiographyWidget(biography: superhero.biography),
+                    if (superhero.powerstats.isNotNull())
+                      PowerstatsWidget(powerstats: superhero.powerstats),
+                  ],
+                ),
+              ),
+            ],
+          );
+        });
   }
 }
 
@@ -336,16 +409,25 @@ class BiographyWidget extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: Container(
                 decoration: BoxDecoration(
-                  color: biography.alignmentInfo!.color,
-                  borderRadius: const BorderRadius.only(topRight: Radius.circular(20),bottomLeft: Radius.circular(20))
-                ),
+                    color: biography.alignmentInfo!.color,
+                    borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(20),
+                        bottomLeft: Radius.circular(20))),
                 width: 24,
                 height: 70,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6,vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
                   child: RotatedBox(
                     quarterTurns: 1,
-                    child: Center(child: Text(biography.alignmentInfo!.name.toUpperCase(),style: TextStyle(color: Colors.white,fontSize: 10,fontWeight: FontWeight.w700),)),
+                    child: Center(
+                        child: Text(
+                      biography.alignmentInfo!.name.toUpperCase(),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700),
+                    )),
                   ),
                 ),
               )),
